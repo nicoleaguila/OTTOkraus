@@ -14,7 +14,7 @@
       required
     ></v-text-field>
     <v-btn  @click="submitForm" color="success" class="mr-4">{{currentToy.id  ? 'actualizar' : 'crear'}}</v-btn>
-    <v-btn color="error" class="mr-4">Cancelar</v-btn>
+    <v-btn  @click="cleancurrentToy" color="error" class="mr-4">Cancelar</v-btn>
   </v-form>
   <v-simple-table dark fixed-header class="mt-5">
     <template v-slot:default>
@@ -23,16 +23,20 @@
           <th class="text-left">Codigo</th>
           <th class="text-left">Nombre</th>
           <th class="text-left">Stock</th>
-           <th class="text-left">Precio</th>
+          <th class="text-left">Precio</th>
+          <th></th>
+          <th></th>
            
         </tr>
       </thead>
       <tbody>
         <tr v-for="toy in toys" :key="toy.id">
+          <td>{{ toy.data.code }}</td>
           <td>{{ toy.data.name }}</td>
-          <td>{{ toy.data.price }}</td>
           <td>{{ toy.data.stock }}</td>
-           <td>{{ toy.data.code }}</td>
+          <td>{{ toy.data.price }}</td>
+          <td><v-icon color= "green" @click="editProduct(toy)">mdi-pencil-outline</v-icon></td>
+          <td><v-icon @click="removeToy(toy.id)">mdi-delete</v-icon></td>
         </tr>
       </tbody>
     </template>
@@ -54,8 +58,8 @@ export default {
           data: {
           code:'',
           name:'',
-          price: 0,
-          stock: 0
+          stock: 0,
+          price: 0
         }
       }
     }
@@ -64,26 +68,46 @@ export default {
     ...mapState(['toys', 'overlay'])
   },
   methods: {
-    ...mapActions(['setToys', 'submitToy']),
+    ...mapActions(['setToys', 'submitToy', 'updateToy', 'deleteToy']),
     submitForm() {
       if(!this.currentToy.id) { // si no tiene id crea toy
         this.createToy()
       }else { // sino, actualiza (edita toy,editar hace aparecer los datos, actualizar es cambiar los datos
-        this.updateToy()
+        this.update(this.currentToy)
       }
+    },
+    update() {
+      this.updateToy(this.currentToy)
+      this.cleancurrentToy()
+    },
+    removeToy(id) {
+      let confirmation = confirm("tay seguro choro")
+      if (confirmation){
+        this.deleteToy(id)
+        this.cleancurrentToy()  
+      }
+      
     },
     createToy() {
       const toy = this.currentToy.data
       this.submitToy(toy)
-      this.cleancurrentToy
-      },
-      cleancurrentToy() {
-        this.currentToy.data.code = '',
-        this.currentToy.data.name = '',
-        this.currentToy.data.price= 0,
-        this.currentToy.data.stock= 0
-        }
-      },
+      this.cleancurrentToy()
+    },
+    cleancurrentToy() {
+      this.currentToy.data.code = '',
+      this.currentToy.data.name = '',
+      this.currentToy.data.stock= 0,
+      this.currentToy.data.price= 0,
+      this.currentToy.id = undefined
+    },
+    editProduct(toy) {
+      this.currentToy.data.code = toy.data.code,
+      this.currentToy.data.name = toy.data.name,
+      this.currentToy.data.stock= toy.data.stock,
+      this.currentToy.data.price= toy.data.price,
+      this.currentToy.id = toy.id
+    }
+  },
   created() {
     this.setToys()
     }

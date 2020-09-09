@@ -51,7 +51,18 @@ export default new Vuex.Store({
       dispatch('setToys') // llamamos a 
     })
     },
-  },
-  modules: {
+    updateToy({dispatch}, toy) {
+      Axios.put(`https://us-central1-ottoklauss-5927c.cloudfunctions.net/toys/toy/${toy.id}`, toy.data)
+      .then(() => {
+        dispatch('setToys')
+      })
+    },
+    deleteToy({dispatch}, id) {
+      Axios.delete(`https://us-central1-ottoklauss-5927c.cloudfunctions.net/toys/toy/${id}`)
+      .then(() => {
+        dispatch('setToys')
+      })
+    }
   }
 })
+
