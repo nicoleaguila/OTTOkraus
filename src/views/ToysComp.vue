@@ -16,6 +16,9 @@
     <v-btn  @click="submitForm" color="success" class="mr-4">{{currentToy.id  ? 'actualizar' : 'crear'}}</v-btn>
     <v-btn  @click="cleancurrentToy" color="error" class="mr-4">Cancelar</v-btn>
   </v-form>
+  <v-container>
+       <v-icon>fas fa-search</v-icon><v-text-field label="Busca un juguete" v-model="search"></v-text-field>
+  </v-container>
   <v-simple-table dark fixed-header class="mt-5">
     <template v-slot:default>
       <thead>
@@ -30,7 +33,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="toy in toys" :key="toy.id">
+        <tr v-for="toy in filterList" :key="toy.id">
           <td>{{ toy.data.code }}</td>
           <td>{{ toy.data.name }}</td>
           <td>{{ toy.data.stock }}</td>
@@ -61,11 +64,18 @@ export default {
           stock: 0,
           price: 0
         }
-      }
+      },
+      search: '',
     }
   },
   computed: {
-    ...mapState(['toys', 'overlay'])
+    ...mapState(['toys', 'overlay']),
+    filterList() {
+      return this.toys.filter((toy) => {
+        return toy.data.name.toLowerCase().includes(this.search.toLowerCase())
+      })
+    }
+  
   },
   methods: {
     ...mapActions(['setToys', 'submitToy', 'updateToy', 'deleteToy']),
